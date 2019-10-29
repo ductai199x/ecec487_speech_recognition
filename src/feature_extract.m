@@ -5,8 +5,8 @@ tic
 
 current_path = strcat(mfilename('fullpath'), '.m');
 
-[path,~,~] = fileparts(current_path);
-path = strrep(path,'src','data/TRAIN/');
+[current_path,~,~] = fileparts(current_path);
+path = strrep(current_path,'src','data/TRAIN/');
 % path = '~/Desktop/TIMIT/TIMIT/TRAIN/';
 
 train_folder_path = dir(fullfile(path));
@@ -34,12 +34,12 @@ end
 
 training_data = cell(size(files, 1),3);
 % N = length(training_data);
-N = 10;
+N = 1;
 Fs = 16000;
 
 for i=1:N
     [audio, ~] = audioread(strcat(files(i).folder, '/', files(i).name));
-    training_data{i}{1} = labels(i);
+    training_data{i}{1} = labels(i,:);
     training_data{i}{2} = audio;
     
     timeVector = (1/Fs) * (0:numel(audio)-1);
@@ -50,19 +50,24 @@ for i=1:N
     coeffs = mfcc(S,Fs,"LogEnergy","Ignore");
     training_data{i}{3} = coeffs;
     
-    filename = [labels(i), '.dat'];
-    fid = fopen(fileName,'w');
-    
-    cnt=fwrite(fid,sign,'int');           wrErr = wrErr | (cnt~=1);
-    cnt=fwrite(fid,1.0,'float');  wrErr = wrErr | (cnt~=1);
-    cnt=fwrite(fid,1,'int');        wrErr = wrErr | (cnt~=1);
-    cnt=fwrite(fid,1,'int8');  wrErr = wrErr | (cnt~=1);
+    filename = strcat(current_path, "/", labels(i,:), '.dat');
+    fid = fopen(filename,'w');
+    wrErr = 0;
+    cnt=fwrite(fid,1,'int');                wrErr = wrErr | (cnt~=1);
+    cnt=fwrite(fid,1.0,'float');            wrErr = wrErr | (cnt~=1);
+    cnt=fwrite(fid,1,'int');                wrErr = wrErr | (cnt~=1);
+    cnt=fwrite(fid,1,'int8');               wrErr = wrErr | (cnt~=1);
     
     cnt=fwrite(fid,size(coeffs,1),'int');      wrErr = wrErr | (cnt~=1);
-    cnt=fwrite(fid,size(coeffs,2),'int');     wrErr = wrErr | (cnt~=1);
-    cnt=fwrite(fid,1,'int');     wrErr = wrErr | (cnt~=1);
+    cnt=fwrite(fid,size(coeffs,2),'int');      wrErr = wrErr | (cnt~=1);
+    cnt=fwrite(fid,1,'int');                   wrErr = wrErr | (cnt~=1);
     
     ss = permute(flipud(coeffs), [2 1 3 4]);
     cnt=fwrite(fid,ss*255,'uchar');
+    wrErr = wrErr | (cnt~=size(coeffs,1)*size(coeffs,2)*1*1);
+    if wrErr
+        error(['Error during writing to file "' filename '"'])
+    end
+    fclose(fid);
     
 end
