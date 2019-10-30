@@ -40,34 +40,43 @@ Fs = 16000;
 for i=1:N
     [audio, ~] = audioread(strcat(files(i).folder, '/', files(i).name));
     training_data{i}{1} = labels(i,:);
-    training_data{i}{2} = audio;
     
     timeVector = (1/Fs) * (0:numel(audio)-1);
     audio = audio ./ max(abs(audio));           % Normalize amplitude
-    windowLength = ceil(numel(audio)/50);
+    windowLength = 50e-3 * Fs;
+    segments = buffer(audio,windowLength);      % Break the audio into 50-millisecond non-overlapping frames
+    win = hamming(windowLength,'periodic');
+    signalEnergy = sum(segments.^2,1)/windowLength;
+    
+%   centroid = SpectralCentroid(audio,windowLength,windowLength,Fs); % Use this when run with MATLAB < 2019
+    centroid = spectralCentroid(segments, Fs, 'Window', win, 'OverlapLength', 0);
+    T_E = mean(signalEnergy)/2;
+    T_C = 5000;
+    isSpeechRegion = (signalEnergy >= T_E) & (centroid <= T_C);
+%   isSpeechRegion = isSpeechRegion(1,:);       % Use this when run with MATLAB < 2019
+    CC = repmat(centroid, windowLength, 1);
+    CC = CC(:);
+    EE = repmat(signalEnergy, windowLength, 1);
+    EE = EE(:);
+    flags2 = repmat(isSpeechRegion, windowLength, 1);
+    flags2 = flags2(:);
+    
+    clipped_audio = audio(flags2 > 0);
+    training_data{i}{2} = clipped_audio;
+    
+    windowLength = ceil(numel(clipped_audio)/50);
     win = hamming(windowLength,"periodic");
-    S = stft(audio,"Window",win,"OverlapLength",floor(windowLength/2));
+    S = stft(clipped_audio,"Window",win,"OverlapLength",floor(windowLength/2));
     coeffs = mfcc(S,Fs,"LogEnergy","Ignore");
+    
     training_data{i}{3} = coeffs;
+
+    filename = strcat(current_path, "/processed_data/", labels(i,:), '.jpg');
+    outputfile = strcat(current_path, "/processed_data/", labels(i,:), '.dat');
     
-    filename = strcat(current_path, "/", labels(i,:), '.dat');
-    fid = fopen(filename,'w');
-    wrErr = 0;
-    cnt=fwrite(fid,1,'int');                wrErr = wrErr | (cnt~=1);
-    cnt=fwrite(fid,1.0,'float');            wrErr = wrErr | (cnt~=1);
-    cnt=fwrite(fid,1,'int');                wrErr = wrErr | (cnt~=1);
-    cnt=fwrite(fid,1,'int8');               wrErr = wrErr | (cnt~=1);
+    imwrite(coeffs,filename)
     
-    cnt=fwrite(fid,size(coeffs,1),'int');      wrErr = wrErr | (cnt~=1);
-    cnt=fwrite(fid,size(coeffs,2),'int');      wrErr = wrErr | (cnt~=1);
-    cnt=fwrite(fid,1,'int');                   wrErr = wrErr | (cnt~=1);
-    
-    ss = permute(flipud(coeffs), [2 1 3 4]);
-    cnt=fwrite(fid,ss*255,'uchar');
-    wrErr = wrErr | (cnt~=size(coeffs,1)*size(coeffs,2)*1*1);
-    if wrErr
-        error(['Error during writing to file "' filename '"'])
-    end
-    fclose(fid);
+    processed = PictureStim(char(filename));
+    processed.save(outputfile);
     
 end

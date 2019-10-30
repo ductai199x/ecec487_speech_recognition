@@ -2,3 +2,4 @@ data/DOC/*
 data/TEST/*
 data/TRAIN/*
 *~
+src/processed_data/*
