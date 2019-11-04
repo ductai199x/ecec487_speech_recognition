@@ -203,8 +203,8 @@ classdef (Abstract) BaseStim < matlab.mixin.Copyable
             end
             
             fclose(fid);
-            disp([obj.baseMsgId ' - Successfully saved stimulus to ' ...
-                'file "' fileName '".'])
+            % disp([obj.baseMsgId ' - Successfully saved stimulus to ' ...
+            %     'file "' fileName '".'])
         end
         
         function plot(obj, frames, steppingMode)

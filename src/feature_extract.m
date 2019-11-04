@@ -33,13 +33,14 @@ end
 %% Import all training data
 
 training_data = cell(size(files, 1),3);
-% N = length(training_data);
-N = 1;
+N = length(training_data);
+% N = 10;
 Fs = 16000;
 
 for i=1:N
     [audio, ~] = audioread(strcat(files(i).folder, '/', files(i).name));
-    training_data{i}{1} = labels(i,:);
+    idx = floor((i-1)/10)+1;
+    training_data{i}{1} = labels(idx,:);
     
     timeVector = (1/Fs) * (0:numel(audio)-1);
     audio = audio ./ max(abs(audio));           % Normalize amplitude
@@ -71,12 +72,13 @@ for i=1:N
     
     training_data{i}{3} = coeffs;
 
-    filename = strcat(current_path, "/processed_data/", labels(i,:), '.jpg');
-    outputfile = strcat(current_path, "/processed_data/", labels(i,:), '.dat');
+    imgfile = strcat(current_path, "/processed_data/", training_data{i}{1}, '_', files(i).name, '.jpg');
+    datfile = strcat(current_path, "/processed_data/", training_data{i}{1}, '_', files(i).name, '.dat');
     
-    imwrite(coeffs,filename)
+    imwrite(coeffs,imgfile)
     
-    processed = PictureStim(char(filename));
-    processed.save(outputfile);
+    processed = PictureStim(char(imgfile));
+    processed.save(datfile);
     
+    delete(imgfile);
 end
