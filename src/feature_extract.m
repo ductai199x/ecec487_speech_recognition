@@ -34,13 +34,14 @@ end
 
 training_data = cell(size(files, 1),3);
 N = length(training_data);
-% N = 10;
+% N = 1;
 Fs = 16000;
-
+textprogressbar('calculating outputs: ');
 for i=1:N
+    textprogressbar(i,N);
     [audio, ~] = audioread(strcat(files(i).folder, '/', files(i).name));
     idx = floor((i-1)/10)+1;
-    training_data{i}{1} = labels(idx,:);
+    training_data{i}{1} = labels(idx,:); 
     
     timeVector = (1/Fs) * (0:numel(audio)-1);
     audio = audio ./ max(abs(audio));           % Normalize amplitude
@@ -66,19 +67,37 @@ for i=1:N
     training_data{i}{2} = clipped_audio;
     
     windowLength = ceil(numel(clipped_audio)/50);
+    overlapLength = floor(windowLength*0.5);
     win = hamming(windowLength,"periodic");
-    S = stft(clipped_audio,"Window",win,"OverlapLength",floor(windowLength/2));
-    coeffs = mfcc(S,Fs,"LogEnergy","Ignore");
+    S = stft(clipped_audio, "Window", win, "OverlapLength", overlapLength);
+    mfcc_coeffs = mfcc(S,Fs,"LogEnergy","Ignore");
     
-    training_data{i}{3} = coeffs;
+    training_data{i}{3} = mfcc_coeffs;
+%     f0 = pitch(clipped_audio, Fs, "WindowLength", windowLength, ...
+%         "OverlapLength", overlapLength, "Method", "PEF");
+%     X = [f0 mfcc_coeffs];
+%     X = (X-mean(X))./var(X);
+%     X(:,1) = X(:,1)*5;
+%     X = bsxfun(@minus,mfcc_coeffs,mean(mfcc_coeffs));
+%     [coeff,score,latent] = pca(X);
+%     dataInPrincipalComponentSpace = X*coeff;
 
-    imgfile = strcat(current_path, "/processed_data/", training_data{i}{1}, '_', files(i).name, '.jpg');
-    datfile = strcat(current_path, "/processed_data/", training_data{i}{1}, '_', files(i).name, '.dat');
+    processed_data = "";
+    if training_data{i}{1}(1) == 'F'
+        processed_data = "/processed_data/female/";
+    else
+        processed_data = "/processed_data/male/";
+    end
     
-    imwrite(coeffs,imgfile)
+    imgfile = strcat(current_path, processed_data, training_data{i}{1}, '_', files(i).name, '.jpg');
+    datfile = strcat(current_path, processed_data, training_data{i}{1}, '_', files(i).name, '.dat');
     
+%     imwrite(dataInPrincipalComponentSpace(:,1:10),imgfile);
+    imwrite(mfcc_coeffs,imgfile);
+
     processed = PictureStim(char(imgfile));
     processed.save(datfile);
     
     delete(imgfile);
 end
+textprogressbar('done');
