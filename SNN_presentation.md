@@ -17,7 +17,7 @@ Okay, now you may ask: "How does it learn?" The quick answer is STDP - Spike Tim
 
 This weight number determines the probability of the pre-synaptic neuron to fire. Hence, in a trained network, a certain group of neurons will fire in a certain pattern when a stimulus is introduced at the input layer -- the same principle our brain use in learning. 
 
-Therefore, in our speech recognition application, the MFCC is presented as the stimulus at the input layer, from which spikes will travel to a hidden layer with a 1 by 3 kernel. 
+Therefore, in our speech recognition application, the MFCC is presented as stimulus at the input layer, from which spikes will travel to a hidden layer with a 1 by 3 kernel. 
 
 The spikes from this hidden layer is then fed into a "max pooling" layer, which takes the spikes pattern from the pre-synaptic neuron that has the highest firing frequency and passes on as output. 
 

@@ -35,8 +35,10 @@ end
 training_audio = cell(size(files, 1),1);
 % training_data = cell(size(files, 1),1);
 training_data = [];
-trainig_labels = cell(size(files, 1),1);
+training_labels = cell(size(files, 1),1);
+
 N = length(files);
+training_labels_bin = zeros([N,1]);
 % N = 1;
 Fs = 16000;
 textprogressbar('calculating outputs: ');
@@ -46,6 +48,9 @@ parfor i=1:N
 %     audio = awgn(audio,5,'measured');
     idx = floor((i-1)/10)+1;
     trainig_labels{i} = labels(idx,:); 
+    if trainig_labels{i}(1) == 'M'
+        training_labels_bin(i) = 1
+    end
     
     timeVector = (1/Fs) * (0:numel(audio)-1);
     audio = audio ./ max(abs(audio));           % Normalize amplitude
@@ -97,24 +102,25 @@ parfor i=1:N
 %     X = bsxfun(@minus,mfcc_coeffs,mean(mfcc_coeffs));
 %     [coeff,score,latent] = pca(X);
 %     dataInPrincipalComponentSpace = X*coeff;
-    training_data(:,:,i) = mfcc_coeffs(:,[2:end]);
+%     training_data(:,:,i) = mfcc_coeffs(:,[2:end]);
+    training_data(:,:,i) = mfcc_coeffs;
     
-    processed_data = "";
-    if trainig_labels{i}(1) == 'F'
-        processed_data = "/processed_data/female/";
-    else
-        processed_data = "/processed_data/male/";
-    end
-    
-    imgfile = strcat(current_path, processed_data, trainig_labels{i}, '_', files(i).name, '.jpg');
-    datfile = strcat(current_path, processed_data, trainig_labels{i}, '_', files(i).name, '.dat');
-    
-%     imwrite(dataInPrincipalComponentSpace(:,1:10),imgfile);
-    imwrite(training_data(:,:,i),imgfile);
-
-    processed = PictureStim(char(imgfile));
-    processed.save(datfile);
-    
-    delete(imgfile);
+%     processed_data = "";
+%     if trainig_labels{i}(1) == 'F'
+%         processed_data = "/processed_data/female/";
+%     else
+%         processed_data = "/processed_data/male/";
+%     end
+%     
+%     imgfile = strcat(current_path, processed_data, trainig_labels{i}, '_', files(i).name, '.jpg');
+%     datfile = strcat(current_path, processed_data, trainig_labels{i}, '_', files(i).name, '.dat');
+%     
+% %     imwrite(dataInPrincipalComponentSpace(:,1:10),imgfile);
+%     imwrite(training_data(:,:,i),imgfile);
+% 
+%     processed = PictureStim(char(imgfile));
+%     processed.save(datfile);
+%     
+%     delete(imgfile);
 end
 textprogressbar('done');

@@ -47,7 +47,7 @@ end
 %% Do speech detection and silence clipping
 
 % parpool('local', 6);
-parfor i=1:N
+parfor i=1:1
     audio = training_data{i}{1};
     timeVector = (1/Fs) * (0:numel(audio)-1);
     audio = audio ./ max(abs(audio));           % Normalize amplitude
