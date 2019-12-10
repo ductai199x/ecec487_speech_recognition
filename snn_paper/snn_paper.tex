@@ -52,13 +52,13 @@
 \maketitle
 
 \begin{abstract}
-	Spiking Neural Network, or SNN, provides a good trade-off between power consumption and accuracy, in comparison to a Convolutional Neural Network (CNN) of the same size. In a SNN, only a portion of the connected neurons remain active to fire spikes in a particular fashion, when the network is presented with a simulus at the input layer. This behavior allows the network to not only be very energy efficient, but also be capable of employing biologically plausible plasticity rules. In this paper, an unsupervised Spiking Neural Network model is simulated using C++ and applied to classify gender information in speech data. Our model is able to achieve an accuracy of 96.5\%, while consuming 55 times less power and running at 3 times the speed, in comparison to a CNN of the same size.
+	Spiking Neural Network, or SNN, provides a good trade-off between power consumption and accuracy, in comparison to a Convolutional Neural Network (CNN) of the same size. In a SNN, only a portion of the connected neurons remain active to fire spikes in a particular fashion, when the network is presented with a simulus at the input layer. This behavior allows the network to not only be very energy efficient, but also be capable of employing biologically plausible plasticity rules. In this paper, 2 Spiking Neural Network models, unsupervised and supervised are simulated using C++ and applied to classify gender information in speech data. Our models is able to achieve an accuracy of 78.85\% and 90.05\%, while consuming 55 times less power and running at 3 times the speed, in comparison to a CNN of the same size.
 \end{abstract}
 
 \section{Introduction}
 \label{intro}
 
-It is no myths that Convolutional Neural Networks are computationally intensive \cite{b1}. Hence, no meaningful machine learning applications using CNNs can be run on small electronic devices in a reasonable amount of time. Often, data from customers' sensors are collected and sent to a very powerful super-computer for processing using CNNs. However, this is not how human brains work -- we do not amass gigabytes of information from every sensor in our body every millisecond and send it somewhere for processing. We would drive into each other before we can react to the things in front of our eyes. Therefore, in order to advance the state of art in the field of human-machine integration, it is necessary to innovate ways to introduce machine learning capabilities with good classification accuracy and security into ultra-low energy devices. If this is achievable, it is possible for human and machine to integrate using Brain-Machine Interfaces (BMI), currently developed by researchers at Neuralink \cite{b2}. In this paper, Spiking Neural Networks will be shown that they can be the solution to the predicament of information processing in machine-human integration. 
+It is no myths that Convolutional Neural Network and its derivates are computationally intensive \cite{b1}. Hence, no meaningful machine learning applications using CNNs can be run on small electronic devices in a reasonable amount of time. Often, data from customers' sensors are collected and sent to a powerful super-computer for CNN processing. However, this is not how human brains work -- we do not amass gigabytes of information from every sensor in our body every millisecond and send it somewhere for processing. We would drive into each other before we can react to the things in front of our eyes. Therefore, in order to advance the state of art in the field of human-machine integration, it is necessary to introduce machine learning capabilities with good classification accuracy and security into ultra-low energy microelectronics. If this is achievable, it is possible for human and machine to integrate using Brain-Machine Interfaces (BMI), currently developed by researchers at Neuralink \cite{b2}. In this paper, Spiking Neural Networks will be shown that they can be the solution to the predicaments of information processing in machine-human integration. 
 
 \section{Background on Spiking Neural Network}
 \label{bg_snn}
@@ -83,7 +83,7 @@ There are 3 common neuronal models (listed with increasing complexity): Leaky In
 	\label{eq1}
 \end{equation}
 
-A LIF neuron is a parallel combination of a "leaky" resistor with conductance $g_L$ and a capacitor with capacitance $C$. When $V(t)$ reaches a threshold level $V_{th}$, the capacitor discharges to a resting potential $V_R$. Since the biological neuron also "undershoots" $V_R$ at the discharging phase (so called Afterhyperpolarization - AHP), there exists a relative refractory period where the neuron cannot fire any new spikes if it is activated by smaller or equal potential. This behavior can be modeled with a dynamic potential threshold $V_{th}$: following each spike, increase $V_{th}$ by an amount \cite{b6}:
+A LIF neuron is a parallel combination of a "leaky" resistor with conductance $g_L$ and a capacitor with capacitance $C$. When $V(t)$ reaches a threshold level $V_{th}$, the capacitor discharges to a resting potential $V_R$. Since the biological neuron also "undershoots" $V_R$ at the discharging phase (so called Afterhyperpolarization - AHP), there exists a relative refractory period where the neuron cannot fire any new spikes if it is depolarized by smaller or equal potential. This behavior can be modeled with a dynamic potential threshold $V_{th}$: following each spike, increase $V_{th}$ by a small amount \cite{b6}:
 
 \begin{equation}
 	V_{th\_next} = V_{th\_prev}(1+\tau t)
@@ -206,18 +206,25 @@ From the table above, it is clear that TIMIT is skewed because the male populati
 
 \subsection{Data Pre-processing Using MFCCs}
 
+% Include a flow diagram of the data preprocessing steps
+
 The audio data available is in the "wav" file format -- a list of millions of 32-bit floating point numbers. There are no correlations between these numbers and the speaker's gender. Hence, it is necessary to transform the data into a different, more concise and more meaningful representation. The most famous transformation is the Short-Term-Fourier-Transform (STFT), which produces a spectrogram -- a 2D matrix that entails the energy at a certain frequency band in a particular time period. 
 
 Due to the fact that the dataset is composed of people with diverse dialects speaking distinct sentences, the STFT spectrogram will look tremendously different from person to person and from sentences to sentences. Therefore, in order to further concise the STFT spectrogram to eliminate these differences, a spectrogram-of-a-spectrogram, or, a cepstral is constructed for each audio signal. In addition, the filter banks (frequency bands) used in the first spectrogram is derived from the nonlinear Mel scale \cite{b8} so that the resulting spectra reflect human hearing better. This combination is called the Mel-frequency cepstrum (MFC). And the coefficients of all MFCs are called the Mel-frequency cepstral coefficients (MFCC).
 
-In addition to performing MFCC analysis on each audio signal, silent and noise removal is also performed 
+% Insert figure of STFT spectrogram vs Mel spectrogram
 
+As audio signals in the database have different lengths, in order to make all Mel spectrograms congruent in shape for the neural network, different window lengths \footnote{with overlap length equals to half of window length} (in number of samples) are calculated for each signal so that the number of windows for the entire signal is always 99 ($50\times 2-1$).
 
-Hence, for each audio signal, the MFCC is created
+In addition to performing MFCC analysis on each audio signal, silent and noise removal is also performed before doing MFCC to further increase the ratio of relevant to irrelevant information in the output signal.
 
 \subsection{SNN Architecture}
-The SNN in this paper consists of 3 different layers: one input layer, one hidden layer and one max-pooling layer. 
 
+% Insert figure of the SNN Architecture
+
+The pre-processed audio signals are fed into the SNN one by one. Since the size of the MFCC is 13 by 99, the input layer will 1287 neurons -- one neuron for every number. In the second layer, every neuron is connected to 3 neurons in the previous layer in a 1 by 3 kernel with a stride of 1 in the x direction and 3 in the y direction. These non-overlapping connections are meant to discover patterns in each of the small region of the MFCC. The third layer is connected to the second layer the same way the second layer is connected to the input layer. However, the type of neurons in this layer is \textbf{\textit{max-pooling}} instead of LIF. 
+
+A max-pooling neuron must connect with more than one neurons from the previous layer. 
 
 
 
@@ -248,3 +255,14 @@ The SNN in this paper consists of 3 different layers: one input layer, one hidde
 \end{thebibliography}
 
 \end{document}
+
+https://www.sciencedirect.com/science/article/pii/S1877050916326904
+https://towardsdatascience.com/spiking-neural-networks-the-next-generation-of-machine-learning-84e167f4eb2b
+https://www.biorxiv.org/content/10.1101/703801v2.full
+https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4930.pdf
+https://www.cns.nyu.edu/~david/handouts/integrate-and-fire.pdf
+https://www.cns.nyu.edu/~david/handouts/poisson.pdf
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5557947/pdf/41598_2017_Article_7418.pdf
+https://journals.plos.org/ploscompbiol/article/file?id=10.1371/journal.pcbi.1004984&type=printable
+https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8335698
+https://www.sciencedirect.com/science/article/pii/S0743731518308773

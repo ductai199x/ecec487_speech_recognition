@@ -7,12 +7,30 @@ current_path = strcat(mfilename('fullpath'), '.m');
 
 [current_path,~,~] = fileparts(current_path);
 path = strrep(current_path,'src','data/TRAIN/');
-% path = '~/Desktop/TIMIT/TIMIT/TRAIN/';
 
 train_folder_path = dir(fullfile(path));
 
 files = [];
 labels = [];
+
+parfor i = 1:length(train_folder_path)
+    if strcmp(train_folder_path(i).name, '.') || strcmp(train_folder_path(i).name, '..')
+        continue
+    end
+    temp_path = dir(fullfile(strcat(path, train_folder_path(i).name)));
+    for j = 1:length(temp_path)
+        if strcmp(temp_path(j).name, '.') || strcmp(temp_path(j).name, '..')
+            continue
+        end
+        labels = [labels; temp_path(j).name];
+        folders = strcat(path, train_folder_path(i).name, '/', temp_path(j).name);
+        files = [files; dir(fullfile(folders, '/*.WAV'))];
+    end
+end
+
+path = strrep(current_path,'src','data/TEST/');
+
+train_folder_path = dir(fullfile(path));
 
 parfor i = 1:length(train_folder_path)
     if strcmp(train_folder_path(i).name, '.') || strcmp(train_folder_path(i).name, '..')
@@ -105,22 +123,22 @@ parfor i=1:N
 %     training_data(:,:,i) = mfcc_coeffs(:,[2:end]);
     training_data(:,:,i) = mfcc_coeffs;
     
-%     processed_data = "";
-%     if trainig_labels{i}(1) == 'F'
-%         processed_data = "/processed_data/female/";
-%     else
-%         processed_data = "/processed_data/male/";
-%     end
-%     
-%     imgfile = strcat(current_path, processed_data, trainig_labels{i}, '_', files(i).name, '.jpg');
-%     datfile = strcat(current_path, processed_data, trainig_labels{i}, '_', files(i).name, '.dat');
-%     
-% %     imwrite(dataInPrincipalComponentSpace(:,1:10),imgfile);
-%     imwrite(training_data(:,:,i),imgfile);
-% 
-%     processed = PictureStim(char(imgfile));
-%     processed.save(datfile);
-%     
-%     delete(imgfile);
+    processed_data = "";
+    if trainig_labels{i}(1) == 'F'
+        processed_data = "/processed_data/female/";
+    else
+        processed_data = "/processed_data/male/";
+    end
+    
+    imgfile = strcat(current_path, processed_data, trainig_labels{i}, '_', files(i).name, '.jpg');
+    datfile = strcat(current_path, processed_data, trainig_labels{i}, '_', files(i).name, '.dat');
+    
+%     imwrite(dataInPrincipalComponentSpace(:,1:10),imgfile);
+    imwrite(training_data(:,:,i),imgfile);
+
+    processed = PictureStim(char(imgfile));
+    processed.save(datfile);
+    
+    delete(imgfile);
 end
 textprogressbar('done');
