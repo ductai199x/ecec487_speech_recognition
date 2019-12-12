@@ -5,14 +5,17 @@
 \citation{b4}
 \@writefile{toc}{\contentsline {section}{\numberline {A}Introduction}{1}}
 \newlabel{intro}{{A}{1}}
+\@writefile{toc}{\contentsline {section}{\numberline {B}Background on Spiking Neural Network}{1}}
+\newlabel{bg_snn}{{B}{1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.1}Spiking Neural Network}{1}}
 \citation{b5}
 \citation{b6}
-\@writefile{toc}{\contentsline {section}{\numberline {B}Background on Spiking Neural Network}{2}}
-\newlabel{bg_snn}{{B}{2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.1}Spiking Neural Network}{2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Simplified Spiking Neuron Model\relax }}{2}}
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:neuron-model}{{1}{2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {B.2}Leaky Integrate-and-Fire Neurons}{2}}
 \newlabel{eq1}{{1}{2}}
-\newlabel{eq2}{{2}{2}}
+\newlabel{eq2}{{2}{3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {B.3}Poisson Spike Model}{3}}
 \newlabel{eq3}{{3}{3}}
 \newlabel{eq4}{{4}{3}}
@@ -22,13 +25,37 @@
 \citation{b7}
 \@writefile{toc}{\contentsline {section}{\numberline {D}Background on DARPA's TIMIT Acoustic-Phonetic Continuous Speech Dataset}{4}}
 \newlabel{dataset}{{D}{4}}
-\citation{b8}
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Table detailing the gender distribution for each dialect region in TIMIT\relax }}{5}}
-\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{table1}{{1}{5}}
 \@writefile{toc}{\contentsline {section}{\numberline {E}Experimental Setup}{5}}
 \newlabel{experimental_setup}{{E}{5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {E.1}Data Pre-processing Using MFCCs}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Flow diagram of the data pre-processing process\relax }}{5}}
+\newlabel{fig:data-preprocessing}{{2}{5}}
+\citation{b8}
+\newlabel{fig:stft-speaker1-sent-1}{{3a}{6}}
+\newlabel{sub@fig:stft-speaker1-sent-1}{{a}{6}}
+\newlabel{fig:stft-speaker1-sent-2}{{3b}{6}}
+\newlabel{sub@fig:stft-speaker1-sent-2}{{b}{6}}
+\newlabel{fig:mel-speaker1-sent-1}{{3c}{6}}
+\newlabel{sub@fig:mel-speaker1-sent-1}{{c}{6}}
+\newlabel{fig:mel-speaker1-sent-2}{{3d}{6}}
+\newlabel{sub@fig:mel-speaker1-sent-2}{{d}{6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Top (a,b): STFT Spectrograms of speaker 1 with 2 different sentences. Bottom (c,d): Mel Spectrograms of the same speaker with the same 2 sentences. It is clear that the STFT Spectrogram provides too much information with respect to individual audio signal, while the Mel Spectrogram provides much more compact information, which is useful in determining gender from speech\relax }}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {E.2}SNN Architecture}{7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces The topology of the Spiking Neural Network\relax }}{7}}
+\newlabel{fig:snn-topology}{{4}{7}}
+\@writefile{toc}{\contentsline {section}{\numberline {F}Simulation Results}{7}}
+\newlabel{sim_res}{{F}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {F.1}Accuracy Rating}{7}}
+\citation{b9}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces \relax }}{8}}
+\newlabel{fig:accuracy-rating}{{5}{8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {F.2}Energy and Speed Rating}{8}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Table detailing energy consumptions in Joules between K-means, KNN, and SVM\relax }}{9}}
+\newlabel{table2}{{2}{9}}
+\@writefile{toc}{\contentsline {section}{\numberline {G}Conclusions and Future Works}{9}}
+\newlabel{future_works}{{G}{9}}
 \bibcite{b1}{1}
 \bibcite{b2}{2}
 \bibcite{b3}{3}
@@ -38,9 +65,3 @@
 \bibcite{b7}{7}
 \bibcite{b8}{8}
 \bibcite{b9}{9}
-\bibcite{b10}{10}
-\@writefile{toc}{\contentsline {subsection}{\numberline {E.2}SNN Architecture}{6}}
-\@writefile{toc}{\contentsline {section}{\numberline {F}Simulation Results}{6}}
-\newlabel{sim_res}{{F}{6}}
-\@writefile{toc}{\contentsline {section}{\numberline {G}Future Works}{6}}
-\newlabel{future_works}{{G}{6}}
